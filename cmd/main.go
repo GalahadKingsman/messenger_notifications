@@ -3,30 +3,24 @@ package main
 import (
 	"log"
 	"messenger_notification/internal/handlers"
-	"messenger_notification/internal/redis"
-	"messenger_notification/internal/subscriber"
+	"messenger_notification/subcriber"
 	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
+	"os"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println(".env not found, using system environment")
+	subcriber.InitRedis()
+
+	http.HandleFunc("/notifications/longpoll", handlers.LongPollHandler)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8082"
 	}
 
-	rdb := redis.NewClient()
-	subscriber.Subscribe(rdb)
-
-	r := chi.NewRouter()
-	h := handlers.NewHandler(rdb)
-
-	r.Get("/notifications/{userID}", h.GetNotifications)
-	r.Get("/notifications/{userID}/longpoll", h.LongPollNotifications)
-	r.Delete("/notifications/{userID}", h.ClearNotifications)
-
-	addr := ":8082"
-	log.Println("Notifications service listening on", addr)
-	log.Fatal(http.ListenAndServe(addr, r))
+	log.Printf("[notifications] Listening on :%s...", port)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
 }

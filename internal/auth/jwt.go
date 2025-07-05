@@ -30,7 +30,7 @@ func ExtractUserID(tokenStr string) (string, error) {
 
 	uid, ok := claims["user_id"].(string)
 	if !ok {
-		// иногда user_id может быть числом
+
 		if idFloat, ok := claims["user_id"].(float64); ok {
 			return fmt.Sprintf("%d", int64(idFloat)), nil
 		}

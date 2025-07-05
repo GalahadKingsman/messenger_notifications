@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/GalahadKingsman/messenger_notifications/internal/handlers"
+	"github.com/GalahadKingsman/messenger_notifications/subcriber"
 	"log"
-	"messenger_notification/internal/handlers"
-	"messenger_notification/subcriber"
 	"net/http"
 	"os"
 )

@@ -1,4 +1,5 @@
-module messenger_notification
+module github.com/GalahadKingsman/messenger_notifications
+
 
 go 1.23
 

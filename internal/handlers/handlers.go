@@ -1,15 +1,19 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
-	"messenger_notification/internal/auth"
-	"messenger_notification/subcriber"
+	"errors"
+	"github.com/GalahadKingsman/messenger_notifications/internal/auth"
+	"github.com/GalahadKingsman/messenger_notifications/subcriber"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 )
 
 func LongPollHandler(w http.ResponseWriter, r *http.Request) {
+
 	token := extractToken(r.Header.Get("Authorization"))
 	if token == "" {
 		http.Error(w, "missing or invalid token", http.StatusUnauthorized)
@@ -18,13 +22,24 @@ func LongPollHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := auth.ExtractUserID(token)
 	if err != nil {
+		log.Printf("[Notifications] auth failed: %v", err)
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
+	log.Printf("[Notifications] LongPollHandler hit for userID=%s, errOnExtract=%v", userID, err)
 
-	notifs, err := subcriber.WaitForMessages(userID, 30*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	notifs, err := subcriber.WaitForMessages(ctx, userID)
 	if err != nil {
-		http.Error(w, "timeout", http.StatusGatewayTimeout)
+
+		if errors.Is(err, context.DeadlineExceeded) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		log.Printf("[Notifications] WaitForMessages error: %v", err)
+		http.Error(w, "gateway error", http.StatusInternalServerError)
 		return
 	}
 

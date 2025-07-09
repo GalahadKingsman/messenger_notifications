@@ -12,6 +12,7 @@ func main() {
 	subcriber.InitRedis()
 
 	http.HandleFunc("/notifications/longpoll", handlers.LongPollHandler)
+	http.HandleFunc("/notifications", subcriber.PostNotificationHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {

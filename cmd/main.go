@@ -15,11 +15,8 @@ func main() {
 	http.HandleFunc("/notifications", subcriber.PostNotificationHandler)
 
 	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8082"
-	}
 
-	log.Printf("[notifications] Listening on :%s...", port)
+	log.Println("[notifications] Listening")
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("failed to start server: %v", err)

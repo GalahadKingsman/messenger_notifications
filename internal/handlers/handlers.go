@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/GalahadKingsman/messenger_notifications/internal/auth"
-	"github.com/GalahadKingsman/messenger_notifications/subcriber"
+	"github.com/GalahadKingsman/messenger_notifications/subscriber"
 	"log"
 	"net/http"
 	"strings"
@@ -31,7 +31,7 @@ func LongPollHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
 	defer cancel()
 
-	notifs, err := subcriber.WaitForMessages(ctx, userID)
+	notifs, err := subscriber.WaitForMessages(ctx, userID)
 	if err != nil {
 
 		if errors.Is(err, context.DeadlineExceeded) {

@@ -2,17 +2,17 @@ package main
 
 import (
 	"github.com/GalahadKingsman/messenger_notifications/internal/handlers"
-	"github.com/GalahadKingsman/messenger_notifications/subcriber"
+	"github.com/GalahadKingsman/messenger_notifications/subscriber"
 	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
-	subcriber.InitRedis()
+	subscriber.InitRedis()
 
 	http.HandleFunc("/notifications/longpoll", handlers.LongPollHandler)
-	http.HandleFunc("/notifications", subcriber.PostNotificationHandler)
+	http.HandleFunc("/notifications", subscriber.PostNotificationHandler)
 
 	port := os.Getenv("PORT")
 
